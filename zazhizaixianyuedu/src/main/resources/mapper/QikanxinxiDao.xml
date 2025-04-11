@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.QikanxinxiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.qikanxinxi_name as qikanxinxiName
+        ,a.zazhixinxi_id as zazhixinxiId
+        ,a.qikanxinxi_file as qikanxinxiFile
+        ,a.qikanxinxi_photo as qikanxinxiPhoto
+        ,a.qikanxinxi_content as qikanxinxiContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.QikanxinxiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,zazhixinxi.zazhixinxi_name as zazhixinxiName
+        ,zazhixinxi.zazhixinxi_types as zazhixinxiTypes
+        ,zazhixinxi.zazhixinxi_photo as zazhixinxiPhoto
+        ,zazhixinxi.zazhixinxi_file as zazhixinxiFile
+        ,zazhixinxi.shangxia_types as shangxiaTypes
+        ,zazhixinxi.zazhixinxi_new_money as zazhixinxiNewMoney
+        ,zazhixinxi.zazhixinxi_content as zazhixinxiContent
+        ,zazhixinxi.zazhixinxi_yesno_types as zazhixinxiYesnoTypes
+        ,zazhixinxi.zazhixinxi_yesno_text as zazhixinxiYesnoText
+
+        FROM qikanxinxi  a
+        left JOIN zazhixinxi zazhixinxi ON a.zazhixinxi_id = zazhixinxi.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.qikanxinxiName != '' and params.qikanxinxiName != null and params.qikanxinxiName != 'null' ">
+                and a.qikanxinxi_name like CONCAT('%',#{params.qikanxinxiName},'%')
+            </if>
+            <if test="params.zazhixinxiId != null and params.zazhixinxiId != ''">
+                and (
+                    a.zazhixinxi_id = #{params.zazhixinxiId}
+                )
+            </if>
+            <if test=" params.qikanxinxiContent != '' and params.qikanxinxiContent != null and params.qikanxinxiContent != 'null' ">
+                and a.qikanxinxi_content like CONCAT('%',#{params.qikanxinxiContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断杂志信息的id不为空 -->
+            <if test=" params.zazhixinxiIdNotNull != '' and params.zazhixinxiIdNotNull != null and params.zazhixinxiIdNotNull != 'null' ">
+                and a.zazhixinxi_id IS NOT NULL
+            </if>
+            <if test=" params.zazhixinxiName != '' and params.zazhixinxiName != null and params.zazhixinxiName != 'null' ">
+                and zazhixinxi.zazhixinxi_name like CONCAT('%',#{params.zazhixinxiName},'%')
+            </if>
+            <if test="params.zazhixinxiTypes != null  and params.zazhixinxiTypes != ''">
+                and zazhixinxi.zazhixinxi_types = #{params.zazhixinxiTypes}
+            </if>
+
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and zazhixinxi.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.zazhixinxiNewMoneyStart != null ">
+                <![CDATA[  and zazhixinxi.zazhixinxi_new_money >= #{params.zazhixinxiNewMoneyStart}   ]]>
+            </if>
+            <if test="params.zazhixinxiNewMoneyEnd != null ">
+                <![CDATA[  and zazhixinxi.zazhixinxi_new_money <= #{params.zazhixinxiNewMoneyEnd}   ]]>
+            </if>
+            <if test=" params.zazhixinxiContent != '' and params.zazhixinxiContent != null and params.zazhixinxiContent != 'null' ">
+                and zazhixinxi.zazhixinxi_content like CONCAT('%',#{params.zazhixinxiContent},'%')
+            </if>
+            <if test="params.zazhixinxiYesnoTypes != null  and params.zazhixinxiYesnoTypes != ''">
+                and zazhixinxi.zazhixinxi_yesno_types = #{params.zazhixinxiYesnoTypes}
+            </if>
+
+            <if test=" params.zazhixinxiYesnoText != '' and params.zazhixinxiYesnoText != null and params.zazhixinxiYesnoText != 'null' ">
+                and zazhixinxi.zazhixinxi_yesno_text like CONCAT('%',#{params.zazhixinxiYesnoText},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(zazhixinxi.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(zazhixinxi.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>

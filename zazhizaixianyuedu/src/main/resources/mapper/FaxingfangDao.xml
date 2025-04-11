@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.FaxingfangDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.username as username
+        ,a.password as password
+        ,a.faxingfang_name as faxingfangName
+        ,a.faxingfang_photo as faxingfangPhoto
+        ,a.sex_types as sexTypes
+        ,a.faxingfang_phone as faxingfangPhone
+        ,a.faxingfang_email as faxingfangEmail
+        ,a.faxingfang_delete as faxingfangDelete
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.FaxingfangView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM faxingfang  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.username != '' and params.username != null and params.username != 'null' ">
+                and a.username like CONCAT('%',#{params.username},'%')
+            </if>
+            <if test=" params.password != '' and params.password != null and params.password != 'null' ">
+                and a.password like CONCAT('%',#{params.password},'%')
+            </if>
+            <if test=" params.faxingfangName != '' and params.faxingfangName != null and params.faxingfangName != 'null' ">
+                and a.faxingfang_name like CONCAT('%',#{params.faxingfangName},'%')
+            </if>
+            <if test="params.sexTypes != null and params.sexTypes != ''">
+                and a.sex_types = #{params.sexTypes}
+            </if>
+            <if test=" params.faxingfangPhone != '' and params.faxingfangPhone != null and params.faxingfangPhone != 'null' ">
+                and a.faxingfang_phone like CONCAT('%',#{params.faxingfangPhone},'%')
+            </if>
+            <if test=" params.faxingfangEmail != '' and params.faxingfangEmail != null and params.faxingfangEmail != 'null' ">
+                and a.faxingfang_email like CONCAT('%',#{params.faxingfangEmail},'%')
+            </if>
+            <if test="params.faxingfangDeleteStart != null and params.faxingfangDeleteStart != ''">
+                <![CDATA[  and a.faxingfang_delete >= #{params.faxingfangDeleteStart}   ]]>
+            </if>
+            <if test="params.faxingfangDeleteEnd != null and params.faxingfangDeleteEnd != ''">
+                <![CDATA[  and a.faxingfang_delete <= #{params.faxingfangDeleteEnd}   ]]>
+            </if>
+             <if test="params.faxingfangDelete != null and params.faxingfangDelete != ''">
+                and a.faxingfang_delete = #{params.faxingfangDelete}
+             </if>
+
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
